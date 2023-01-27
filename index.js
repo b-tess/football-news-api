@@ -36,7 +36,7 @@ newspapers.forEach(newspaper => {
 
             //Give the returned response to cheerio to help with picking out what is needed
             const $ = cheerio.load(html)
-            $('a:contains("football")', html).each(function () {
+            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"]', html).each(function () {
                 const title = $(this).text()
                 const url = $(this).attr('href')
 
