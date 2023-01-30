@@ -57,10 +57,73 @@ app.get('/', (req,res) => {
 
 //Create a route for the articles returned by cheerio
 app.get('/footballnews', (req,res) => {
+    res.json(articles)    
+})
 
-    res.json(articles)
+//Create a route for articles from a specific newspaper
+app.get('/footballnews/:newspaperId', (req, res) => {
+    const newspaperId = req.params.newspaperId
 
-    // axios.get('https://www.theguardian.com/football')
+    //Get an array with one element of the specific newspaper object from the newspapers array
+    const newspaperAddress = newspapers.filter(newspaper => newspaper.name == newspaperId)[0].address
+    const newspaperBase = newspapers.filter(newspaper => newspaper.name == newspaperId[0].base)
+    
+
+    //Get the articles from the specific newspaper only and pass them to cheerio 
+    axios.get(newspaperAddress)
+        .then(response => {
+            const html = response.data
+            const $ = cheerio.load(html)
+            const specificArticles = []
+
+            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"]', html).each(function () {
+                const title = $(this).text()
+                const url = $(this).attr('href')
+
+                specificArticles.push({
+                    title,
+                    url: newspaperBase + url,
+                    source: newspaperId,
+                })
+            })
+            res.json(specificArticles)
+            console.log(specificArticles.length)
+        })
+        .catch((error) => console.log(error))
+    // try {
+    //     const response = await axios.get(newspaperAddress)
+    //     const html = response.data
+    //     const $ = cheerio.load(html)
+
+    //     $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"]', html).each(function () {
+    //         const title = $(this).text()
+    //         const url = $(this).attr('href')
+
+    //         //Create an array of objects containing the articles from the specific newspaper
+            
+    //         specificArticles.push({
+    //             title,
+    //             url: newspaperBase + url,
+    //             source: newspaperId,
+    //         })
+    //         res.json(specificArticles)
+    //     })
+    // } catch (error) {
+    //     console.log(error)
+    // }
+})
+
+//Check if express is listening to the dedicated port.
+app.listen(PORT, () => console.log(`server running on port ${PORT}`))
+
+
+
+
+
+
+
+
+// axios.get('https://www.theguardian.com/football')
     //     .then((response) => {
     //         const html = response.data
             
@@ -79,7 +142,3 @@ app.get('/footballnews', (req,res) => {
     //         res.json(articles)
     //     })
     //     .catch((error) => console.log(error))
-})
-
-//Check if express is listening to the dedicated port.
-app.listen(PORT, () => console.log(`server running on port ${PORT}`))
