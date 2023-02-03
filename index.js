@@ -10,11 +10,6 @@ const app = express()
 //Create an array of newspapers
 const newspapers = [
     {
-        name: 'thestandard',
-        address: 'https://www.standardmedia.co.ke/sports/category/29/football',
-        base: '',
-    },
-    {
         name: 'thestar',
         address: 'https://www.the-star.co.ke/sports/football',
         base: 'https://www.the-star.co.ke',
@@ -46,7 +41,7 @@ newspapers.forEach(newspaper => {
 
             //Give the returned response to cheerio to help with picking out what is needed
             const $ = cheerio.load(html)
-            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+            $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
                 const title = $(this).text()
                 const url = $(this).attr('href')
 
@@ -86,7 +81,7 @@ app.get('/footballnews/:newspaperId', (req, res) => {
             const $ = cheerio.load(html)
             const specificArticles = []
 
-            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+            $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
                 const title = $(this).text()
                 const url = $(this).attr('href')
 
