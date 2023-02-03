@@ -10,6 +10,11 @@ const app = express()
 //Create an array of newspapers
 const newspapers = [
     {
+        name: 'thestandard',
+        address: 'https://www.standardmedia.co.ke/sports/category/29/football',
+        base: '',
+    },
+    {
         name: 'thestar',
         address: 'https://www.the-star.co.ke/sports/football',
         base: 'https://www.the-star.co.ke',
@@ -41,7 +46,7 @@ newspapers.forEach(newspaper => {
 
             //Give the returned response to cheerio to help with picking out what is needed
             const $ = cheerio.load(html)
-            $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
                 const title = $(this).text()
                 const url = $(this).attr('href')
 
@@ -81,7 +86,7 @@ app.get('/footballnews/:newspaperId', (req, res) => {
             const $ = cheerio.load(html)
             const specificArticles = []
 
-            $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+            $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
                 const title = $(this).text()
                 const url = $(this).attr('href')
 
@@ -97,58 +102,4 @@ app.get('/footballnews/:newspaperId', (req, res) => {
 })
 
 //Check if express is listening to the dedicated port.
-app.listen(process.env.PORT || PORT, () => console.log(`server running on port ${PORT}`))
-
-
-
-
-
-
-
-
-// axios.get('https://www.theguardian.com/football')
-    //     .then((response) => {
-    //         const html = response.data
-            
-    //         //Give the returned response to cheerio to help with picking out what is needed
-    //         const $ = cheerio.load(html)
-
-    //         $('a:contains("football")', html).each(function () {
-    //             const title = $(this).text()
-    //             const url = $(this).attr('href')
-
-    //             articles.push({
-    //                 title,
-    //                 url,
-    //             })
-    //         })
-    //         res.json(articles)
-    //     })
-    //     .catch((error) => console.log(error))
-
-    //app.get('/footballnews/:newspaperId', async (req, res)... I'm not sure why Ania used the async word in this function and did not use await at any point in the body of the function. The function also seems to work just fine without the async word....
-
-
-
-
-    // try {
-    //     const response = await axios.get(newspaperAddress)
-    //     const html = response.data
-    //     const $ = cheerio.load(html)
-
-    //     $('div[class="article-body"]>a[href*="football"],div[class*="card-body"]>a[href*="football"],div[class^="fc"] a[href*="football"]', html).each(function () {
-    //         const title = $(this).text()
-    //         const url = $(this).attr('href')
-
-    //         //Create an array of objects containing the articles from the specific newspaper
-            
-    //         specificArticles.push({
-    //             title,
-    //             url: newspaperBase + url,
-    //             source: newspaperId,
-    //         })
-    //         res.json(specificArticles)
-    //     })
-    // } catch (error) {
-    //     console.log(error)
-    // }
+app.listen(PORT, () => console.log(`server running on port ${PORT}`))
