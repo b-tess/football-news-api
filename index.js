@@ -25,7 +25,7 @@ const newspapers = [
         base: 'https://nation.africa',
     },
     {
-        name: 'thetelegraph',
+        name: 'telegraph',
         address: 'https://www.telegraph.co.uk/football/',
         base: 'https://www.telegraph.co.uk',
     },
