@@ -33,28 +33,6 @@ const newspapers = [
 
 const articles = []
 
-//Loop through the newspapers and get all the relevant elements
-// newspapers.forEach(newspaper => {
-//     axios.get(newspaper.address)
-//         .then(response => {
-//             const html = response.data
-
-//             //Give the returned response to cheerio to help with picking out what is needed
-//             const $ = cheerio.load(html)
-//             $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
-//                 const title = $(this).text()
-//                 const url = $(this).attr('href')
-
-//                 articles.push({
-//                     title,
-//                     url: newspaper.base + url,
-//                     source: newspaper.name,
-//                 })
-//             })
-//         })
-//         .catch((error) => console.log(error))
-// })
-
 //Create a generic home path/route
 app.get('/', (req, res) => {
     res.json('Welcome to my Football News API!')
