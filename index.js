@@ -34,35 +34,63 @@ const newspapers = [
 const articles = []
 
 //Loop through the newspapers and get all the relevant elements
-newspapers.forEach(newspaper => {
-    axios.get(newspaper.address)
-        .then(response => {
-            const html = response.data
+// newspapers.forEach(newspaper => {
+//     axios.get(newspaper.address)
+//         .then(response => {
+//             const html = response.data
 
-            //Give the returned response to cheerio to help with picking out what is needed
-            const $ = cheerio.load(html)
-            $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
-                const title = $(this).text()
-                const url = $(this).attr('href')
+//             //Give the returned response to cheerio to help with picking out what is needed
+//             const $ = cheerio.load(html)
+//             $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+//                 const title = $(this).text()
+//                 const url = $(this).attr('href')
 
-                articles.push({
-                    title,
-                    url: newspaper.base + url,
-                    source: newspaper.name,
-                })
-            })
-        })
-        .catch((error) => console.log(error))
-})
+//                 articles.push({
+//                     title,
+//                     url: newspaper.base + url,
+//                     source: newspaper.name,
+//                 })
+//             })
+//         })
+//         .catch((error) => console.log(error))
+// })
 
 //Create a generic home path/route
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
     res.json('Welcome to my Football News API!')
 })
 
 //Create a route for the articles from all the newspapers returned by cheerio
-app.get('/footballnews', (req,res) => {
-    res.json(articles)    
+app.get('/footballnews', async (req, res) => {
+    const news = newspapers.map(newspaper => axios.get(newspaper.address))
+
+    //Using promise.all is a way to wait for all the http requests to the publications to either ba fulfilled or one of them to be rejected. This array of results/result is what is returned with this call to promise.all().
+    //The response contains a value of the publication pages html gotten by the call to axios.get above.
+    await Promise.all(news) 
+        .then(response => {
+            response.forEach(res => {
+                const html = res.data
+                const base = ((new URL(res.config.url)).hostname) //Create a base URL (hostname = domain name response.config.url is an axios url object)
+                // const name = base.replace('www.', '').split('.')
+
+                //Give the returned response to cheerio to help with picking out what is needed
+                const $ = cheerio.load(html)
+
+                $('div[class="article-body"]>a[href*="football"],div[class^="fc"] a[href*="football"],section[class*="large-col"] a[href*="football"],div[class*="article-list"]>a[href*="football"],h2[class*="list-headline"]>a[href*="football"]', html).each(function () {
+                    const title = $(this).text()
+                    const url = $(this).attr('href')
+
+                    articles.push({
+                        title,
+                        url: (!url.includes(base) ? `https://${base}` : '') + url,
+                        source: (base.replace('www.', '').split('.'))[0],
+                    })
+                })
+            })
+        })
+        .catch(error => console.log(error))
+
+    res.json(articles)
 })
 
 //Create a route for articles from a specific newspaper
